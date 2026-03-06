@@ -29,7 +29,10 @@ export async function GET() {
     // 4. 각 파일 분석 API 호출 (스트리밍 없이 순차 처리)
     for (const file of newFiles) {
       try {
-        const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
+        const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+        const baseUrl = railwayDomain
+          ? `https://${railwayDomain}`
+          : (process.env.NEXTAUTH_URL ?? 'http://localhost:3000');
         const res = await fetch(`${baseUrl}/api/analyze`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
