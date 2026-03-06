@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { GeneratedEstimate, EstimateItem } from '@/lib/types';
 import LineItemEditor from './LineItemEditor';
+import { SOILAB_COMPANY } from '@/lib/constants';
 
 const KRW = (n: number) => `₩${n.toLocaleString()}`;
 
@@ -80,11 +81,15 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
     );
   }
 
+  function handlePrint() {
+    window.print();
+  }
+
   return (
     <div className="space-y-4">
       {/* 헤더 */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start mb-2">
           <div>
             <span className="font-bold text-blue-700 text-xl">SOILAB</span>
             <span className="ml-4 text-lg font-semibold tracking-widest">견 / 적 / 서</span>
@@ -95,6 +100,9 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
             <div>PROJECT: {request.project_name}</div>
           </div>
         </div>
+        <p className="text-xs text-gray-400 border-t border-gray-100 pt-2">
+          {SOILAB_COMPANY.name} · 대표자: {SOILAB_COMPANY.ceo} · 사업자등록번호: {SOILAB_COMPANY.bizNo} · TEL: {SOILAB_COMPANY.tel} · {SOILAB_COMPANY.address}
+        </p>
 
         {/* 합계 행 */}
         <div className="border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 flex justify-between items-center">
@@ -157,6 +165,12 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
           className="flex-1 border border-gray-300 hover:bg-gray-50 text-sm py-2 rounded-lg transition-colors"
         >
           {editing ? '✅ 편집 완료' : '✏️ 항목 직접 편집'}
+        </button>
+        <button
+          onClick={handlePrint}
+          className="flex-1 border border-gray-300 hover:bg-gray-50 text-sm py-2 rounded-lg transition-colors"
+        >
+          🖨️ PDF 저장
         </button>
         <button
           onClick={handleDownload}

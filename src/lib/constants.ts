@@ -1,3 +1,13 @@
+export const SOILAB_COMPANY = {
+  name: '협동조합 소이랩',
+  ceo: '강아름',
+  bizNo: '502-82-21040',
+  tel: '053-941-9003',
+  fax: '053)710-7216',
+  email: 'soilabcoop@gmail.com',
+  address: '대구 북구 대현로3 2층',
+};
+
 // 2026년 학술연구용역 인건비 기준단가 및 소이랩 운영비 단가
 export const SOILAB_DEFAULTS = {
   // 2026 학술연구용역 인건비 기준단가

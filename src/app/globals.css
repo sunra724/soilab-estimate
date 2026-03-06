@@ -7,3 +7,15 @@
 body {
   font-family: var(--font-noto), Arial, sans-serif;
 }
+
+@media print {
+  header, nav {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .space-y-4 > *:last-child {
+    display: none !important; /* 하단 버튼 숨김 */
+  }
+}

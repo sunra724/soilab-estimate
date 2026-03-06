@@ -13,6 +13,7 @@ import {
   VerticalAlign,
 } from 'docx';
 import type { GeneratedEstimate, EstimateItem } from './types';
+import { SOILAB_COMPANY } from './constants';
 
 // ─── 공통 유틸 ────────────────────────────────────────────────────────────────
 
@@ -109,7 +110,7 @@ function buildCompanyInfo(): Paragraph[] {
       alignment: AlignmentType.LEFT,
       spacing: { before: 0, after: 60 },
       children: [
-        new TextRun({ text: '(주)소이랩  |  대표: 소이랩  |  사업자등록번호: 000-00-00000', size: 16, font: 'Malgun Gothic' }),
+        new TextRun({ text: `${SOILAB_COMPANY.name}  |  대표자: ${SOILAB_COMPANY.ceo}  |  사업자등록번호: ${SOILAB_COMPANY.bizNo}  |  TEL: ${SOILAB_COMPANY.tel}  |  E-mail: ${SOILAB_COMPANY.email}  |  주소: ${SOILAB_COMPANY.address}`, size: 16, font: 'Malgun Gothic' }),
       ],
     }),
   ];
@@ -255,7 +256,7 @@ function buildFooter(): Paragraph[] {
       alignment: AlignmentType.CENTER,
       spacing: { before: 400, after: 0 },
       children: [
-        new TextRun({ text: '(주)소이랩  |  Tel: 000-0000-0000  |  Email: contact@soilab.kr', size: 16, font: 'Malgun Gothic' }),
+        new TextRun({ text: `${SOILAB_COMPANY.name}  |  TEL: ${SOILAB_COMPANY.tel}  |  Fax: ${SOILAB_COMPANY.fax}  |  E-mail: ${SOILAB_COMPANY.email}`, size: 16, font: 'Malgun Gothic' }),
       ],
     }),
   ];
