@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SQLite DB (Railway 볼륨에서 관리)
+/data/*.db
