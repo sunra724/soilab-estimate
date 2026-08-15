@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { listEstimateFiles } from '@/lib/drive';
 import { getDb } from '@/lib/db';
 import { initDb } from '@/lib/schema';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
     initDb();
     const db = getDb();
@@ -29,14 +29,15 @@ export async function GET() {
     // 4. 각 파일 분석 API 호출 (스트리밍 없이 순차 처리)
     for (const file of newFiles) {
       try {
-        const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
-        const baseUrl = railwayDomain
-          ? `https://${railwayDomain}`
-          : (process.env.NEXTAUTH_URL ?? 'http://localhost:3000');
-        const res = await fetch(`${baseUrl}/api/analyze`, {
+        const analyzeUrl = new URL('/api/analyze', request.url);
+        const res = await fetch(analyzeUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Cookie: request.headers.get('cookie') ?? '',
+          },
           body: JSON.stringify({ fileId: file.id, fileName: file.name }),
+          cache: 'no-store',
         });
 
         if (!res.ok) {

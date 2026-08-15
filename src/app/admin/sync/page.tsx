@@ -47,7 +47,7 @@ export default function SyncPage() {
     setError('');
     setSyncResult(null);
     try {
-      const res = await fetch('/api/drive/sync');
+      const res = await fetch('/api/drive/sync', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? '동기화 실패');
       setSyncResult(data);

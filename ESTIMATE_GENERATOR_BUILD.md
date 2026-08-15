@@ -82,7 +82,8 @@ GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\
 GOOGLE_DRIVE_FOLDER_ID=1AbCdEfGhIjKlMn...   # 견적서가 저장된 폴더 ID
 
 # Admin
-ADMIN_PASSWORD=soilab2026
+APP_PASSWORD=change-this-password
+ADMIN_EMAILS=soilabcoop@gmail.com,sunra724@gmail.com
 ```
 
 > **Google Drive 서비스 계정 설정**:

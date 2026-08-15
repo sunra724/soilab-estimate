@@ -28,6 +28,7 @@ const DEFAULT_FORM: GenerateRequest = {
 export default function EstimateForm({ onGenerate, loading, setLoading }: Props) {
   const [form, setForm] = useState<GenerateRequest>(DEFAULT_FORM);
   const [error, setError] = useState('');
+  const [noticeConfirmed, setNoticeConfirmed] = useState(false);
 
   const subtotal = form.target_amount > 0
     ? Math.floor(form.target_amount / 1.1 / 10_000) * 10_000
@@ -69,7 +70,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={form.client_name}
             onChange={(e) => set('client_name', e.target.value)}
-            placeholder="예: 남구청 인구총괄과"
+            placeholder="예: 가상 발주처"
             required
           />
         </div>
@@ -79,7 +80,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={form.project_name}
             onChange={(e) => set('project_name', e.target.value)}
-            placeholder="예: 2026 청년 커뮤니티 리빙랩"
+            placeholder="예: 가상 리빙랩 프로젝트"
             required
           />
         </div>
@@ -212,9 +213,20 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
         <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
       )}
 
+      <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs leading-5 text-blue-950">
+        <input
+          type="checkbox"
+          checked={noticeConfirmed}
+          onChange={(event) => setNoticeConfirmed(event.target.checked)}
+          required
+          className="mt-0.5"
+        />
+        <span>실제 개인정보·계약정보·영업비밀을 입력하지 않고, 생성 결과를 검토용 견적 초안으로 사용하겠습니다.</span>
+      </label>
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !noticeConfirmed}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
       >
         {loading ? '⏳ 생성 중...' : '✨ 견적서 자동 생성'}

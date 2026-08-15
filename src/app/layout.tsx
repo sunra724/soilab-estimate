@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
-import Link from 'next/link';
 import './globals.css';
 
 const notoSansKR = Noto_Sans_KR({
@@ -27,40 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
 
-        <div className="flex max-w-screen-xl mx-auto">
-          {/* 좌측 사이드바 네비게이션 */}
-          <nav className="w-48 shrink-0 border-r border-gray-200 bg-white min-h-[calc(100vh-3.5rem)] pt-6 hidden md:block">
-            <ul className="space-y-1 px-3">
-              <li>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                >
-                  <span>🏠</span> 견적 생성
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                >
-                  <span>📊</span> 학습 데이터
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/admin/sync"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                >
-                  <span>⚙️</span> 관리자
-                </Link>
-              </li>
-            </ul>
-          </nav>
-
-          {/* 메인 콘텐츠 */}
-          <main className="flex-1 min-w-0">{children}</main>
-        </div>
+        <main className="mx-auto min-w-0 max-w-screen-xl">{children}</main>
       </body>
     </html>
   );

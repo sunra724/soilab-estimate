@@ -158,6 +158,10 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
         <p className="text-xs text-gray-400">{reference_estimates.join(' / ')}</p>
       )}
 
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 print:hidden">
+        <strong>검토 필요:</strong> 이 문서는 AI와 기준값으로 구성한 견적 초안입니다. 실제 계약·입찰·제출에 사용하기 전에 항목, 단가, 산식, 부가세, 관련 법령과 발주처 기준을 담당자가 최종 확인해 주세요.
+      </div>
+
       {/* 하단 버튼 */}
       <div className="flex gap-2">
         <button
