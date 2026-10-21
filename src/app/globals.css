@@ -15,7 +15,9 @@ body {
   body {
     background: white !important;
   }
-  .space-y-4 > *:last-child {
-    display: none !important; /* 하단 버튼 숨김 */
-  }
+  @page { size: A4; margin: 12mm; }
+  table { width: 100%; font-size: 9pt; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  .estimate-actions { display: none !important; }
 }

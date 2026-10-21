@@ -15,6 +15,7 @@ interface Props {
 export default function EstimatePreview({ estimate, onUpdate }: Props) {
   const [editing, setEditing] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState('');
 
   if (!estimate) {
     return (
@@ -31,6 +32,7 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
 
   async function handleDownload() {
     setDownloading(true);
+    setDownloadError('');
     try {
       const res = await fetch('/api/export/docx', {
         method: 'POST',
@@ -45,8 +47,12 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
       const disposition = res.headers.get('Content-Disposition') ?? '';
       const match = disposition.match(/filename\*=UTF-8''(.+)/);
       a.download = match ? decodeURIComponent(match[1]) : '견적서.docx';
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      a.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch {
+      setDownloadError('문서를 내려받지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setDownloading(false);
     }
@@ -62,7 +68,7 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
       <>
         <tr className="bg-yellow-300">
           <td className="px-2 py-1 font-bold text-center border border-gray-300">{no}</td>
-          <td className="px-2 py-1 font-bold border border-gray-300" colSpan={5}>{label}</td>
+          <td className="px-2 py-1 font-bold border border-gray-300" colSpan={4}>{label}</td>
           <td className="px-2 py-1 font-bold text-right border border-gray-300">{KRW(sectionSubtotal)}</td>
           <td className="border border-gray-300"></td>
         </tr>
@@ -158,12 +164,14 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
         <p className="text-xs text-gray-400">{reference_estimates.join(' / ')}</p>
       )}
 
-      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 print:hidden">
-        <strong>검토 필요:</strong> 이 문서는 AI와 기준값으로 구성한 견적 초안입니다. 실제 계약·입찰·제출에 사용하기 전에 항목, 단가, 산식, 부가세, 관련 법령과 발주처 기준을 담당자가 최종 확인해 주세요.
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+        <strong>{estimate.generation_mode === 'standard' ? '기준 항목으로 생성:' : '검토 필요:'}</strong>{' '}
+        {estimate.generation_mode === 'standard' ? 'AI 항목 생성을 사용하지 못해 내부 기준 항목과 입력 조건으로 구성했습니다. 추가 요청사항은 자동 반영되지 않았으니 직접 검토·편집해 주세요. ' : '이 문서는 AI와 기준값으로 구성한 견적 초안입니다. '}
+        실제 계약·입찰·제출 전에 항목, 단가, 산식, 부가세와 발주처 기준을 담당자가 확인해 주세요.
       </div>
 
       {/* 하단 버튼 */}
-      <div className="flex gap-2">
+      <div className="estimate-actions flex gap-2 print:hidden">
         <button
           onClick={() => setEditing(!editing)}
           className="flex-1 border border-gray-300 hover:bg-gray-50 text-sm py-2 rounded-lg transition-colors"
@@ -186,8 +194,9 @@ export default function EstimatePreview({ estimate, onUpdate }: Props) {
       </div>
 
       {/* 인라인 편집기 */}
+      {downloadError && <p role="alert" className="text-sm text-red-600">{downloadError}</p>}
       {editing && (
-        <LineItemEditor estimate={estimate} onUpdate={onUpdate} />
+        <div className="print:hidden"><LineItemEditor estimate={estimate} onUpdate={onUpdate} /></div>
       )}
     </div>
   );

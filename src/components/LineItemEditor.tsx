@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { GeneratedEstimate, EstimateItem } from '@/lib/types';
+import { fitItemsToBudget, recalculateEstimate } from '@/lib/estimate-math';
 
 const KRW = (n: number) => `₩${n.toLocaleString()}`;
 
@@ -18,6 +19,7 @@ const SECTION_LABELS: Record<Section, string> = {
 };
 
 export default function LineItemEditor({ estimate, onUpdate }: Props) {
+  const [error, setError] = useState('');
   const [items, setItems] = useState<EstimateItem[]>(() => [
     ...estimate.sections.labor.items,
     ...estimate.sections.operations.items,
@@ -36,7 +38,7 @@ export default function LineItemEditor({ estimate, onUpdate }: Props) {
       if (field === 'item_name' || field === 'remarks') {
         (item as Record<string, unknown>)[field] = raw;
       } else {
-        const num = Number(raw) || 0;
+        const num = Math.max(0, Math.trunc(Number(raw) || 0));
         (item as Record<string, unknown>)[field] = num;
         // 합계 자동 재계산
         if (field === 'quantity' || field === 'frequency' || field === 'unit_price') {
@@ -67,39 +69,21 @@ export default function LineItemEditor({ estimate, onUpdate }: Props) {
   }
 
   function autoBalance() {
-    // 운영비 마지막 항목에서 차이 흡수
-    const lastOpsIdx = [...items].map((i, idx) => ({ i, idx }))
-      .filter(({ i }) => i.section === 'operations')
-      .pop()?.idx;
-    if (lastOpsIdx === undefined) return;
-    setItems((prev) => {
-      const next = [...prev];
-      next[lastOpsIdx] = {
-        ...next[lastOpsIdx],
-        total: next[lastOpsIdx].total - diff,
-        unit_price: Math.max(0, next[lastOpsIdx].unit_price - diff),
-      };
-      return next;
-    });
+    setError('');
+    try {
+      const otherItems = items.filter((item) => item.section !== 'operations');
+      const available = targetSubtotal - otherItems.reduce((sum, item) => sum + item.total, 0);
+      const operations = fitItemsToBudget(items.filter((item) => item.section === 'operations'), available);
+      setItems([...otherItems, ...operations]);
+    } catch {
+      setError('운영비에 배분할 예산과 항목이 필요합니다. 인건비·관리비가 목표 소계를 초과하지 않는지 확인해 주세요.');
+    }
   }
 
   function applyChanges() {
-    const labor = items.filter((i) => i.section === 'labor');
-    const operations = items.filter((i) => i.section === 'operations');
-    const admin = items.filter((i) => i.section === 'admin');
-    const newSubtotal = items.reduce((s, i) => s + i.total, 0);
-    const newVat = Math.floor(newSubtotal * 0.1);
-    onUpdate({
-      ...estimate,
-      sections: {
-        labor: { items: labor, subtotal: labor.reduce((s, i) => s + i.total, 0) },
-        operations: { items: operations, subtotal: operations.reduce((s, i) => s + i.total, 0) },
-        admin: { items: admin, subtotal: admin.reduce((s, i) => s + i.total, 0) },
-      },
-      subtotal: newSubtotal,
-      vat: newVat,
-      total_with_vat: newSubtotal + newVat,
-    });
+    setError('');
+    try { onUpdate(recalculateEstimate(estimate, items)); }
+    catch { setError('항목 금액을 확인해 주세요. 금액은 0 이상의 정수여야 합니다.'); }
   }
 
   return (
@@ -168,8 +152,8 @@ export default function LineItemEditor({ estimate, onUpdate }: Props) {
                     type="number"
                     className="col-span-2 border rounded px-1 py-1 text-right font-medium"
                     value={item.total}
-                    onChange={(e) => updateItem(idx, 'total', e.target.value)}
-                    title="합계"
+                    readOnly
+                    title="합계 · 수량×회차×단가로 계산"
                   />
                   <button
                     onClick={() => removeItem(idx)}
@@ -198,6 +182,7 @@ export default function LineItemEditor({ estimate, onUpdate }: Props) {
           변경 적용
         </button>
       </div>
+      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }

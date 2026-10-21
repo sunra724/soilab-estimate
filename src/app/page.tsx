@@ -22,9 +22,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="flex flex-col gap-0 lg:flex-row">
+      <div className="flex flex-col gap-0 lg:flex-row print:block">
         {/* 좌측: 입력 폼 */}
-        <div className="shrink-0 border-r border-gray-200 p-5 lg:w-[420px]">
+        <div className="shrink-0 border-r border-gray-200 p-5 lg:w-[420px] print:hidden">
           <EstimateForm
             onGenerate={(data) => setEstimate(data as GeneratedEstimate)}
             loading={loading}
@@ -33,11 +33,11 @@ export default function HomePage() {
         </div>
 
         {/* 우측: 미리보기 */}
-        <div className="flex-1 p-5">
+        <div className="min-w-0 flex-1 p-5 print:p-0">
           {loading ? (
             <div className="flex h-96 flex-col items-center justify-center gap-4 text-gray-400">
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-              <p className="text-sm">Claude AI가 견적서를 구성하고 있습니다...</p>
+              <p className="text-sm">조건에 맞는 견적 초안을 구성하고 있습니다...</p>
             </div>
           ) : (
             <EstimatePreview estimate={estimate} onUpdate={setEstimate} />
