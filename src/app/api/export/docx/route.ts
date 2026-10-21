@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildEstimateDocx, Packer } from '@/lib/docx-template';
-import type { GeneratedEstimate } from '@/lib/types';
+import { parseGeneratedEstimate } from '@/lib/validation';
 import { format } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const estimate = await req.json() as GeneratedEstimate;
-
-    if (!estimate?.request) {
-      return NextResponse.json({ error: '견적서 데이터가 없습니다.' }, { status: 400 });
-    }
+    let estimate;
+    try { estimate = parseGeneratedEstimate(await req.json()); }
+    catch { return NextResponse.json({ error: '견적서 항목과 합계를 확인한 뒤 다시 내려받아 주세요.' }, { status: 400 }); }
 
     const doc = buildEstimateDocx(estimate);
     const buffer = await Packer.toBuffer(doc);
@@ -29,9 +27,9 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[export/docx]', err);
+    console.error('[export/docx] Document export failed.', err instanceof Error ? err.name : 'UnknownError');
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : String(err) },
+      { error: '문서 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.' },
       { status: 500 }
     );
   }

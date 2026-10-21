@@ -46,6 +46,7 @@ export interface GenerateRequest {
 
 // 생성된 견적서
 export interface GeneratedEstimate {
+  generation_mode?: 'ai' | 'standard';
   request: GenerateRequest;
   sections: {
     labor: { items: EstimateItem[]; subtotal: number };

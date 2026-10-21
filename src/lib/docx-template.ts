@@ -308,6 +308,7 @@ export function buildEstimateDocx(estimate: GeneratedEstimate): Document {
           ...buildHeader(estimate),
           ...buildCompanyInfo(),
           ...buildIntro(),
+          new Paragraph({ children: [new TextRun({ text: estimate.generation_mode === 'standard' ? '검토용 초안 · AI 생성 대신 내부 기준 항목으로 구성했습니다. 항목·단가·산식을 담당자가 확인해 주세요.' : '검토용 초안 · 항목·단가·산식을 담당자가 확인해 주세요.', size: 16, font: 'Malgun Gothic' })] }),
           buildTotalRow(estimate),
           new Paragraph({ spacing: { before: 100, after: 0 }, children: [] }),
           buildItemsTable(estimate),

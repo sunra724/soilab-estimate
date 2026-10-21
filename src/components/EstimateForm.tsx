@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { GenerateRequest } from '@/lib/types';
+import { taxIncludedAmounts } from '@/lib/estimate-math';
 
 const PROJECT_TYPES = ['리빙랩', '교육', '컨설팅', '조사연구', '행사운영', '기타'];
 
@@ -30,10 +31,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
   const [error, setError] = useState('');
   const [noticeConfirmed, setNoticeConfirmed] = useState(false);
 
-  const subtotal = form.target_amount > 0
-    ? Math.floor(form.target_amount / 1.1 / 10_000) * 10_000
-    : 0;
-  const vat = Math.floor(subtotal * 0.1);
+  const { subtotal, vat } = taxIncludedAmounts(form.target_amount);
 
   function set<K extends keyof GenerateRequest>(key: K, value: GenerateRequest[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -72,6 +70,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
             onChange={(e) => set('client_name', e.target.value)}
             placeholder="예: 가상 발주처"
             required
+            maxLength={200}
           />
         </div>
         <div>
@@ -82,6 +81,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
             onChange={(e) => set('project_name', e.target.value)}
             placeholder="예: 가상 리빙랩 프로젝트"
             required
+            maxLength={200}
           />
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -123,6 +123,8 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
               placeholder="27280000"
               required
               min={1000000}
+              max={100000000000}
+              step={1}
             />
           </div>
         </div>
@@ -157,6 +159,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
               value={form.workshop_count}
               onChange={(e) => set('workshop_count', Number(e.target.value))}
               min={0}
+              max={10000}
               required
             />
           </div>
@@ -168,6 +171,7 @@ export default function EstimateForm({ onGenerate, loading, setLoading }: Props)
               value={form.participants_count}
               onChange={(e) => set('participants_count', Number(e.target.value))}
               min={1}
+              max={100000}
               required
             />
           </div>
